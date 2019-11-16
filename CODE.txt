@@ -1,0 +1,178 @@
+#include <U8g2lib.h>
+
+#include <Wire.h>
+
+volatile int MIN;
+volatile int SEC;
+U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, SCL, SDA, U8X8_PIN_NONE);
+volatile int an;
+volatile int fla;
+volatile int flag;
+volatile int item;
+volatile int ttime;
+volatile int time_max;
+
+void setup(){
+  pinMode(8, INPUT);
+  Serial.begin(9600);
+   u8g2.begin();
+
+  pinMode(7, INPUT); 
+  pinMode(3, OUTPUT); 
+  ttime = 0;
+  MIN = 0;
+  SEC = 0;
+  flag = 0;
+  time_max = 1;
+  item = 0;
+  fla = 0;
+  an = 0;
+ 
+  u8g2.firstPage();
+  do {
+  u8g2.setFont(u8g2_font_timR14_tr);
+  u8g2.setFontPosTop();
+  u8g2.setCursor(0,0);
+  u8g2.print("Example line 1");
+  u8g2.setCursor(0,15);
+  u8g2.print("Example line 2");
+  u8g2.setCursor(0,29);
+  u8g2.print("Example line 3");
+  u8g2.setCursor(0,43);
+  u8g2.print("Example line 4");
+  }
+  while(u8g2.nextPage() );
+  pinMode(7, INPUT);
+  pinMode(8, INPUT);
+  pinMode(A0, INPUT);
+}
+
+void loop(){
+  while (true) {
+    if (digitalRead(7) == 1) {
+        if (fla == 0) {
+          an = an + 1;
+         
+        }
+        fla = 1;
+  
+      }else fla = 0;
+      if (digitalRead(8) == 0) {
+        if (flag == 0) {
+          item = item + 1;
+         
+        }
+        flag = 1;
+  
+      }else flag = 0;
+    
+    time_max = item * 60;
+  ttime = (map(analogRead(A0), 1, 1024, 1, time_max));
+
+    if (digitalRead(7) == 1) {
+        if (fla == 0) {
+          an = an + 1;
+         
+        }
+        fla = 1;
+  
+      }else fla = 0;
+     Serial.println(fla);
+     Serial.println(an);
+      
+  
+  
+  u8g2.firstPage();
+  do {
+  u8g2.setFont(u8g2_font_timR14_tr);
+  u8g2.setFontPosTop();
+  u8g2.setCursor(0,0);
+  u8g2.print("Time Max");
+  u8g2.setCursor(0,15);
+  u8g2.print(time_max);
+  u8g2.setCursor(0,29);
+  u8g2.print("Time Set");
+  u8g2.setCursor(0,43);
+  u8g2.print(ttime);
+  }
+  while(u8g2.nextPage() );
+    if (digitalRead(7) == 1) {
+        if (fla == 0) {
+          an = an + 1;
+         
+        }
+        fla = 1;
+  
+      }else fla = 0;
+      
+//&& an / 2 != round(an / 2)
+  if (fla) {
+    for (int i = ttime; i >= 0; i-- ){
+      MIN = floor(i / 60);
+      SEC = i - MIN * 60;
+      u8g2.firstPage();
+      do {
+      u8g2.setFont(u8g2_font_timR14_tr);
+      u8g2.setFontPosTop();
+      u8g2.setCursor(0,0);
+      u8g2.print("TIME REMIND");
+      u8g2.setCursor(0,15);
+      u8g2.print(String("MINUTE:") + String(MIN));
+      u8g2.setCursor(0,29);
+      u8g2.print(String("SECOND:") + String(SEC));
+      u8g2.setCursor(0,43);
+      u8g2.print("Example line 4");
+      }
+      while(u8g2.nextPage() );
+      delay(550);
+      if (digitalRead(7))
+      {
+          i = -1;
+      }
+    }
+    an = 0;
+    ////TIMEUP_______________________________________________
+    
+   
+
+      
+    while(!digitalRead(7)){
+      u8g2.firstPage();
+      do {
+      u8g2.setFont(u8g2_font_timR14_tr);
+      u8g2.setFontPosTop();
+      u8g2.setCursor(0,0);
+      u8g2.print("");
+      u8g2.setCursor(0,15);
+      u8g2.print("");
+      u8g2.setCursor(0,29);
+      u8g2.print("");
+      u8g2.setCursor(0,43);
+      u8g2.print("");
+      }
+      while(u8g2.nextPage() );
+      
+      digitalWrite(3,1);
+      delay(100);
+      digitalWrite(3,0);
+
+      
+       u8g2.firstPage();
+      do {
+      u8g2.setFont(u8g2_font_timR14_tr);
+      u8g2.setFontPosTop();
+      u8g2.setCursor(0,0);
+      u8g2.print("TIME REMIND");
+      u8g2.setCursor(0,15);
+      u8g2.print("");
+      u8g2.setCursor(0,29);
+      u8g2.print("TIME UP");
+      u8g2.setCursor(0,43);
+      u8g2.print("");
+      }
+      while(u8g2.nextPage() );
+    }
+    }
+ 
+  }
+}
